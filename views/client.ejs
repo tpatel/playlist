@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Playlist</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <h1>Playlist - Remote control</h1>
+    
+    <div id="boxplayer">
+		<div class="lfloat search center">
+			<p>Submit music and vote <small>[ 9bZkp7q19f0 - a1HbiDJEA58 - tKi9Z-f6qX4 ]</small></p>
+			<input id="video" type="text"></input><a id="submitVideo" href="#">Submit</a>
+		</div>
+		<div id="infos" class="lfloat">
+			<h3>Current video</h3>
+			<p><span id="currentVideo"></span></p>
+			<h3>Playlist</h3>
+			<ul id="playlist"></ul>
+		</div>
+    </div>
+    
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		var socket = io.connect('http://localhost');
+		socket.on('connect', function() {
+			socket.emit('subscribe', {room: '<%=roomId%>'});
+		});
+
+		var playlist = $('#playlist');
+		var currentVideo = $('#currentVideo');
+		socket.on('videoList', function (room) {
+			console.log(room);
+			currentVideo.text(room.current ? room.current : 'no video');
+			var videos = room.queue;
+			
+			playlist.html('');
+			for(var i in videos) {
+				playlist.append(
+					$('<li>')
+						.text(videos[i].url+' ')
+						.append($('<small>').text(Object.keys(videos[i].votes).length + ' vote(s)'))
+				);
+			}
+		});
+		
+		$('#submitVideo').click(function(e) {
+			var u = $('#video').val();
+			$('#video').val('');
+			socket.emit('newVideo', {url:u});
+			e.preventDefault();
+		});
+		
+	</script>
+  </body>
+</html>

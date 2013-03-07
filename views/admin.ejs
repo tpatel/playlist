@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Playlist</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="/js/qrcode.js"></script>
+  </head>
+  <body>
+    <h1>Playlist - Viewer</h1>
+    
+    <div id="boxplayer">
+		<div class="lfloat"><span id="player"></span></div>
+		<div id="infos" class="lfloat">
+			<h3>Current video</h3>
+			<p><span id="currentVideo"></span></p>
+			<h3>Playlist</h3>
+			<ul id="playlist"></ul>
+			<h3>Vote here</h3>
+			<div id="qr" class="center"></div>
+			<div class="center"><a href="<%=clientUrl%>" target="_blank">Open client</a></div>
+		</div>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+	<script>
+		var waitingVideo = false;
+		var room = null;
+		
+		var base = 'http://localhost:3000';
+		var socket = io.connect('http://localhost');
+		socket.on('connect', function() {
+			socket.emit('subscribe', {room: '<%=roomId%>'});
+		});
+
+		var playlist = $('#playlist');
+		var currentVideo = $('#currentVideo');
+		socket.on('videoList', function (roomData) {
+			room = roomData;
+			console.log(room);
+			currentVideo.text(room.current ? room.current : 'no video');
+			var videos = room.queue;
+			
+			playlist.html('');
+			for(var i in videos) {
+				playlist.append(
+					$('<li>')
+						.text(videos[i].url+' ')
+						.append($('<br>'))
+						.append($('<small>').text(Object.keys(videos[i].votes).length + ' vote(s)'))
+				);
+			}
+			if(waitingVideo && room.queue.length > 0) {
+				playFirst();
+			}
+		});
+	</script>
+	
+	<script>
+		function onYouTubeIframeAPIReady(playerId) {
+			var ytplayer = document.getElementById("ytPlayer");
+			// This causes the updatePlayerInfo function to be called every 250ms to
+			// get fresh data from the player
+			setInterval(updatePlayerInfo, 250);
+			updatePlayerInfo();
+			ytplayer.addEventListener("onStateChange", "onPlayerStateChange");
+			ytplayer.addEventListener("onError", "onPlayerError");
+		}
+		
+		var tag = document.createElement('script');
+		tag.src = "//www.youtube.com/iframe_api";
+		var firstScriptTag = document.getElementsByTagName('script')[0];
+		firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+		var player;
+		function onYouTubeIframeAPIReady() {
+			player = new YT.Player('player', {
+				height: '480',
+				width: '800',
+				playerVars:{rel: 0, //Pas de vidéos relatives à la fin
+					modestbranding:1, //Pas de logo youtube en bas à droite
+					fs:0, //Pas de boutton plein écran
+					iv_load_policy:3, //Pas d'annotations vidéos
+					theme:'light',
+				},
+				//videoId: '9bZkp7q19f0',
+				events: {
+					'onReady': onPlayerReady,
+					'onStateChange': onPlayerStateChange,
+					'onError': onPlayerError
+				}
+			});
+		}
+
+		function onPlayerReady(event) {
+			//Ready for first video !
+			if(room.current) {
+				player.loadVideoById(room.current);
+			} else {
+				playFirst();
+			}
+		}
+
+		function onPlayerStateChange(event) {
+			if(event.data == YT.PlayerState.ENDED) {
+				//Next video
+				console.log('next Video !');
+				playFirst();
+			}
+		}
+		
+		function onPlayerError(event) {
+			setTimeout(playFirst, 500); //next, anyway
+		}
+		
+		function playFirst() {
+			if(room  && room.queue.length > 0) {
+				var current = room.queue[0].url;
+				player.loadVideoById(current);
+				socket.emit('playingVideo', {room: room.roomId, url:current});
+				waitingVideo = false;
+			} else {
+				socket.emit('playingVideo', {room: room.roomId, url:null});
+				waitingVideo = true;
+			}
+		}
+	</script>
+	
+	<script>
+		var qr = qrcode(3, 'M');
+		qr.addData(base + '<%=clientUrl%>');
+		qr.make();
+		$('#qr').html(qr.createImgTag(4, 5));
+	</script>
+  </body>
+</html>

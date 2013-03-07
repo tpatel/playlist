@@ -1,0 +1,53 @@
+body {
+  max-width:940px;
+  background-color:#F3F3F3;
+  margin:0 auto;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+h1, h3 {
+	background-color:#3D3D3D;
+	color:#F3F3F3;
+	text-align:center;
+	padding:5px;
+	margin:0;
+}
+
+h3 {
+	margin:0 0 10px 0;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.lfloat {
+	float:left;
+}
+
+#infos {
+	width:140px;
+}
+
+#boxplayer {
+	background-color:#D3D3D3;
+	overflow: auto;
+}
+
+#playlist {
+	list-style:none;
+	padding:0;
+}
+
+#playlist li {
+	
+}
+
+.search {
+	width:790px;
+	padding:5px;
+}
+
+.center {
+	text-align:center;
+}
