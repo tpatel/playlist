@@ -27,8 +27,8 @@
 		var waitingVideo = false;
 		var room = null;
 		
-		var base = 'http://localhost:3000';
-		var socket = io.connect('http://localhost');
+		var base = 'http://localhost';
+		var socket = io.connect(base);
 		socket.on('connect', function() {
 			socket.emit('subscribe', {room: '<%=roomId%>'});
 		});
