@@ -34,7 +34,7 @@ app.get('/new', routes.newRoom);
 app.get('/r/:id', routes.admin);
 app.get('/c/:id', routes.client);
 
-io = socketio.listen(server);
+io = socketio.listen(server, {log:false});
 
 routes.setUpSocketIO(io);
 

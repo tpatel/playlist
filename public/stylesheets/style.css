@@ -51,3 +51,29 @@ a {
 .center {
 	text-align:center;
 }
+
+/* NanoSearch */
+
+.outer-box {margin-top:10px}
+.inner-box {
+	width:300px;
+	margin:auto;
+	padding:20px;
+}
+.link-box {
+	width:100px;
+	margin:10px auto 35px auto;
+}
+.answer-link {color:#3d3d3d}
+.result-box {
+	width:200px;
+	list-style:none;
+	display:inline-block;
+	margin:0 25px 10px 25px;
+	padding:0;
+	vertical-align:top;
+	background-color:#DAD9CA;
+}
+.result-box img {width:200px}
+.result-box a {color: #E00259}
+.results {padding:0}

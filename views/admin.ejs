@@ -5,6 +5,7 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script src="/js/qrcode.js"></script>
+    <script src="/js/conf.js"></script>
   </head>
   <body>
     <h1>Playlist - Viewer</h1>
@@ -27,7 +28,6 @@
 		var waitingVideo = false;
 		var room = null;
 		
-		var base = 'http://localhost';
 		var socket = io.connect(base);
 		socket.on('connect', function() {
 			socket.emit('subscribe', {room: '<%=roomId%>'});

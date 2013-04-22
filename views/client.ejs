@@ -4,14 +4,38 @@
     <title>Playlist</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="http://code.angularjs.org/1.0.1/angular-1.0.1.js"></script>
+    <script type="text/javascript" src="/js/controllers.js"></script>
+    <script type="text/javascript" src="http://code.angularjs.org/1.0.1/angular-resource-1.0.1.js"></script>
+    <script src="/js/conf.js"></script>
   </head>
-  <body>
+  <body ng-app="NanoSearch">
     <h1>Playlist - Remote control</h1>
     
     <div id="boxplayer">
-		<div class="lfloat search center">
-			<p>Submit music and vote <small>[ 9bZkp7q19f0 - a1HbiDJEA58 - tKi9Z-f6qX4 ]</small></p>
-			<input id="video" type="text"></input><a id="submitVideo" href="#">Submit</a>
+		<div class="lfloat search center" ng-controller="SearchController">
+<!---->
+<div class="outer-box center">
+	<div class="inner-box">
+		<form ng-submit="search()"><input type="text" ng-model="q" focus></input>
+	<div class="link-box">
+		<a class="answer-link" ng-click="search()">
+			<div class="inner-link-box">Search videos</div>
+		</a>
+	</div>
+		</form>
+	</div>
+</div>
+<div>
+	<p class="center">{{msg}}</p>
+	<ul class="results center">
+        <li ng-repeat="v in videos" class="result-box">
+            <a href="#" onclick="return addTrack('{{v.media$group.yt$videoid.$t}}')"><img ng-src="{{v.media$group.media$thumbnail[1].url}}" style="height:155px;"/></a>
+            <p><a href="#" onclick="return addTrack('{{v.media$group.yt$videoid.$t}}')">{{v.title.$t}}</a> <br/><small>by {{v.author[0].name.$t}}</small></p>
+        </li>
+    </ul>
+</div>
+<!---->
 		</div>
 		<div id="infos" class="lfloat">
 			<h3>Current video</h3>
@@ -23,7 +47,6 @@
     
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
-		var base = 'http://localhost';
 		var socket = io.connect(base);
 		socket.on('connect', function() {
 			socket.emit('subscribe', {room: '<%=roomId%>'});
@@ -49,9 +72,16 @@
 		$('#submitVideo').click(function(e) {
 			var u = $('#video').val();
 			$('#video').val('');
-			socket.emit('newVideo', {url:u});
+			
 			e.preventDefault();
 		});
+		
+		function addTrack(id) {
+			console.log('angularclick', id);
+			socket.emit('newVideo', {url:id});
+			$('input').select();
+			return false;
+		}
 		
 	</script>
   </body>
